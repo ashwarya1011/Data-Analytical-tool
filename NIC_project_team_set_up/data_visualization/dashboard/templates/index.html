@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization Tool</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header styling */
+        .header {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            position: relative;
+            top: 0;
+            width: 100%;
+            height: 110px; /* Adjust the height as needed */
+            /*background-color: #333;*/ /* Fallback color */
+            overflow: hidden;
+            z-index: 200;
+        }
+
+        .header-image {
+            width: 100%;
+            height: auto;
+            object-fit: cover; /* Ensures the image covers the header area without distortion */
+            object-position: center; /* Centers the image within the header */
+        }
+
+        .header-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures the video covers the header area without distortion */
+            object-position: center;
+        }
+
+        /* Container styling */
+        .container {
+            background-color: #f0f2f5;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            padding: 50px 70px;
+            width: 88%;
+            height: 100%;
+            max-width: 90%;
+            margin: 10px auto 222px auto;
+            text-align: center;
+            z-index: 500;
+        }
+
+        /* Header styling for h1 elements */
+        h1 {
+            color: #007bff;
+            font-size: 28px;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        /* Dropdown styling */
+        .dropdowns {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .dropdown-container {
+            width: 22%;
+            margin: 0 20px;
+        }
+
+        .dropdown-container label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        select {
+            width: 100%;
+            padding: 13px 17px;
+            margin: 0 20px;
+            border-radius: 8px;
+            border: 1px solid #d1d1d1;
+            background-color: #f9f9f9;
+            color: #333;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        /* Financial year checkboxes styling */
+        .fy-checkboxes {
+            width: 39%;
+            text-align: left;
+            margin: 20px;
+            padding: 13px 17px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #d1d1d1;
+        }
+
+        .fy-checkboxes label {
+            display: block;
+            margin: 8px 0;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .fy-checkboxes strong {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Buttons styling */
+        .buttons {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        button {
+            padding: 12px 30px;
+            border-radius: 8px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        button:focus {
+            outline: none;
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Special button styling */
+        button:last-child {
+            background-color: #28a745;
+        }
+
+        button:last-child:hover {
+            background-color: #218838;
+        }
+
+        button:last-child:focus,
+        button:last-child:active {
+            background-color: #218838;
+        }
+
+        /* Visualization container */
+        #visualization-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: auto;
+            z-index: 150;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            padding: 20px 20px;
+        }
+
+        /* Insights container */
+        #insights-container-load {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: auto;
+            z-index: 150;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            margin-bottom: 50px;
+            padding: 20px;
+            border: 2px solid #ebedec;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            color: #333;
+        }
+
+        /* Footer styling */
+        .footer {
+            background-color: rgb(36, 131, 196);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            width: 100%;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            height: 25px;
+            z-index: 100;
+            position: relative;
+            bottom: 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .footer-image {
+            width: 80px;
+            height: auto;
+        }
+
+        .footer-image.left {
+            margin-left: 20px;
+        }
+
+        .footer-image.right {
+            margin-right: 20px;
+        }
+
+        /* Insights header styling */
+        .insights-header h2 {
+            font-size: 24px;
+            color: #007bff;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* Highlighted text for insights */
+        .highlight {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .insights-content {
+            justify-content: center;   
+            align-items: center;      
+            height: 100vh;             
+            text-align: center;        
+            background-color: #f9f9f9; /* Light background for contrast */
+            border-radius: 8px; /* Rounded corners */
+            padding: 20px; /* Padding around the content */
+            margin-top: 20px; /* Space above the insights */
+            width: 100%; /* Full width of the container */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        }
+
+        .insights-content p {
+            font-size: 18px; /* Larger font size for readability */
+            line-height: 1.8; /* Spacing between lines */
+            color: #333; /* Darker text color */
+            margin: 10px 0; /* Space between paragraphs */
+            text-align: left; /* Align text to the left */
+        }
+
+        .highlight {
+            color: #28a745; /* Green color for highlighted text */
+            font-weight: bold; /* Bold highlight for emphasis */
+        }
+
+        .insights-content p strong {
+            color: #007bff; /* Blue for the labels */
+        }
+
+        .insights-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Adds space between each line */
+            align-items: flex-start; /* Aligns items to the start of the container */
+            justify-content: flex-start;
+        }
+
+        @media (max-width: 768px) {
+            .insights-content {
+                padding: 15px; /* Adjust padding for mobile screens */
+            }
+            .insights-content p {
+                font-size: 16px; /* Adjust font size for smaller screens */
+            }
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+    {% load static %}
+    <div class="header">
+        <img src="{% static 'Assets/a.svg' %}" alt="Header Image" class="header-image">
+    </div>
+    <!-- <div class="header">
+        <video class="header-video" autoplay muted loop>
+            <source src="{% static 'Assets/header_video.mp4' %}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div> -->
+
+    <div class="container">
+        <!-- <h1>Data Visualization Tool</h1> -->
+        
+        
+        <div class="dropdowns">
+
+            <div class="dropdown-container">
+                <label for="dataset-dropdown">Choose Dataset:</label>
+                <select name="dataset" id="dataset-dropdown" title="Choose Dataset" onchange="fetchStates(this.value)">
+                    <option value="" disabled selected>Choose Dataset</option>
+                    <option value="Jjm">Jal Jeevan Mission</option>
+                    <option value="FinancingOfGrossFiscalDeficit">Financing of Gross Fiscal Deficit</option>
+                    <option value="Pmjdy">Pradhan Mantri Jan Dhan Yojna</option>
+                    <option value="RuralHealthStatistics">Rural Health Statistics</option>
+                </select>
+            </div>
+            
+            <div class="dropdown-container">
+                <label for="state-dropdown">Choose State:</label> <!-- Added label -->
+                <select name="state" id="state-dropdown" title="Choose State">
+                    <option value="" disabled selected>Choose State</option> <!-- Default value set to All -->
+                </select>
+            </div>
+            
+            <div class="fy-checkboxes" id="FY_checkboxes">
+                <label for="FY_checkboxes"> Choose Financial Year: </label> 
+            </div>
+
+            <div class="dropdown-container">
+                <label for="KPI_dropdown">Choose KPI:</label> <!-- Added label -->
+                <select name="KPI" id="KPI_dropdown" title="Choose KPI" onchange="">
+                    <option value="" disabled selected>Select KPI</option> <!-- Default value set to All -->
+                </select>
+            </div>
+
+        </div>
+
+        <div id="plot-checkboxes" class="fy-checkboxes">
+            <strong>Select Plot Types:</strong>
+            <label><input type="checkbox" value="line_plot" id="line_plot"> Line Plot</label>
+            <label><input type="checkbox" value="bar_plot" id="bar_plot"> Bar Plot</label>
+            <label><input type="checkbox" value="scatter_plot" id="scatter_plot"> Scatter Plot</label>
+            <label><input type="checkbox" value="pie_chart" id="pie_chart"> Pie Chart</label>
+            <label><input type="checkbox" value="box_plot" id="box_plot"> Box Plot</label>
+            <label><input type="checkbox" value="histogram" id="histogram"> Histogram</label>
+        </div>
+
+
+        <!-- Separate buttons for visualize and insights -->
+        <div class="buttons">
+            <button id="visualize-button" onclick="submitForm('visualize')">Visualize</button>
+            <button id="insights-button" onclick="submitForm('generate_insights')">Generate Insights</button>
+        </div>
+
+
+
+    </div>
+
+    <div id="visualization-container">
+    </div>
+
+    <div id="insights-container">
+    </div>
+
+    {% load static %}
+    <div class="footer">
+        <p> This platform is designed and developed by Ashwarya Negi & Lovish Tripathi. </p>
+    </div>
+
+    <script>
+        function getFormattedDatasetName(dataset) {
+            switch (dataset) {
+                case 'Jjm':
+                    return 'Jal Jeevan Mission';
+                case 'FinancingOfGrossFiscalDeficit':
+                    return 'Financing Of Gross Fiscal Deficit';
+                case 'Pmjdy':
+                    return 'Pradhan Mantri Jan Dhan Yojana';
+                case 'RuralHealthStatistics':
+                    return 'Rural Health Statistics';
+                default:
+                    return dataset; // Return the original name if no match is found
+            }
+        }
+
+        function fetchStates(dataset) {
+            fetch(`/dashboard/get-states/?dataset=${dataset}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                const stateDropdown = document.getElementById('state-dropdown');
+                // const districtDropdown = document.getElementById('district-dropdown');
+                const fyContainer = document.getElementById('FY_checkboxes');
+
+                stateDropdown.innerHTML = '<option value="" disabled selected> Choose State</option>';
+                // districtDropdown.innerHTML = '<option value="All" selected>All</option>';
+                fyContainer.innerHTML = 'Choose Financial Year:'; 
+
+                if (data.states.length > 0) {
+                    data.states.forEach(state => {
+                        stateDropdown.innerHTML += `<option value="${state}">${state}</option>`;
+                    });
+                }
+
+
+                if (data.financial_years.length > 0) {
+
+                    const sortedFinancialYears = data.financial_years.sort((a, b) => a.localeCompare(b));
+                    sortedFinancialYears.forEach(fy => {
+                        fyContainer.innerHTML += `
+                            <label>
+                                <input type="checkbox" name="FY" value="${fy}"> ${fy}
+                            </label>
+                        `;
+                    });
+                }
+
+                fetchKPIs(dataset);
+            })
+                .catch(error => console.error('Error fetching statess and financial years:', error));
+            }
+
+        //dynamically populates the KPI dropdown based on the selected datase
+        function fetchKPIs(dataset) {
+            fetch(`/dashboard/get-kpis/?dataset=${dataset}`)
+                .then(response => response.json())
+                .then(data => {
+                    const kpiContainer = document.getElementById('KPI_dropdown');
+                    kpiContainer.innerHTML = '<option value="" disabled selected>Select KPI</option>';
+                    // console.log(data.kpis)
+                    data.kpis.forEach(kpi => {
+                        kpiContainer.innerHTML += `
+                            <option value="${kpi}">${kpi.replace(/_/g, ' ')}</option>
+                        `;
+                    });
+                })
+                .catch(error => console.error('Error fetching KPIs:', error));
+        }
+        //correctly gather the selected values and send them to the backend.
+        function submitForm(action) {
+            const dataset = document.getElementById('dataset-dropdown').value;
+            const state = document.getElementById('state-dropdown').value;
+            // const district = document.getElementById('district-dropdown').value;
+            // const financial_year = document.getElementById('FY_dropdown').value;
+            const financial_years = Array.from(document.querySelectorAll('input[name="FY"]:checked')).map(checkbox => checkbox.value).sort((a, b) => a.localeCompare(b)); // Sort them in lexicographical order
+            const kpis = document.getElementById('KPI_dropdown').value;
+            const plotTypes = Array.from(document.querySelectorAll('#plot-checkboxes input:checked')).map(checkbox => checkbox.value);
+
+            const formData = {
+                dataset: dataset,
+                state: state,
+                // district: district,
+                financial_years: financial_years,
+                kpis: kpis,
+                action: action,
+                plot_types: plotTypes
+            };
+            // This is a Django-specific header used to include the CSRF (Cross-Site Request Forgery) token in the request. 
+            // {{ csrf_token }} is a Django template tag that inserts the CSRF token for security purposes. This token helps
+            //  protect against CSRF attacks by ensuring that the request is coming from a trusted source.
+
+            fetch('/dashboard/process_form/', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+                .then(data => {
+
+
+
+                if (action === 'visualize') {
+                    // Handle visualization
+                    const container = document.getElementById('visualization-container');
+                    container.innerHTML = '';
+                    data.plots.forEach(graph => {
+                        graph = JSON.parse(graph);
+                        const graph_div = document.createElement("div");
+                        Plotly.newPlot(graph_div, graph);
+                        container.appendChild(graph_div);
+                    });
+                } else if (action === 'generate_insights') {
+                    // Handle insights
+                    const insights = data.insights;
+                    const insightsContainer = document.getElementById('insights-container');
+                    const formattedDataset = getFormattedDatasetName(insights.dataset);
+                    insightsContainer.innerHTML = `
+                        <div id="insights-container-load">
+                        <div class="insights-header">
+                            <h2>Insights Overview</h2>
+                        </div>
+                        <div class="insights-content">
+                            <p><strong>Selected Dataset:</strong> <span class="highlight">${formattedDataset}</span></p>
+                            <p><strong>Selected State:</strong> <span class="highlight">${insights.state}</span></p>
+                            <p><strong>KPI:</strong> <span class="highlight">${insights.kpi.replace(/_/g, ' ')}</span></p>
+                            <p><strong>Mean:</strong> <span class="highlight">${insights.mean_kpi.toFixed(2)}</span></p>
+                            <p><strong>Median:</strong> <span class="highlight">${insights.median_kpi.toFixed(2)}</span></p>
+                            <p><strong>Trend:</strong> <span class="highlight">${insights.trend}</span></p>
+                            <p><strong>Growth Trend:</strong> <span class="highlight">${insights.growth_trend}</span></p>
+                            <p><strong>Predicted Value for ${kpis.replace(/_/g, ' ')}:</strong> <span class="highlight">${insights.next_prediction_results}</span></p>
+                        </div>
+                        </div>
+                    `;
+                    }
+                })
+                .catch(error => console.error('Error processing form:', error));
+    }
+    </script>
+</body>
+</html>
